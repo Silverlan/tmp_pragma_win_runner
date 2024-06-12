@@ -90,40 +90,49 @@ LONG MiniDumper::TopLevelFilter(struct _EXCEPTION_POINTERS *pExceptionInfo)
 
 	if(hDll) {
 		MINIDUMPWRITEDUMP pDump = (MINIDUMPWRITEDUMP)::GetProcAddress(hDll, "MiniDumpWriteDump");
+		std::cout<<"pDump"<<std::endl;
 		if(pDump) {
 			FileManager::CreateDirectory("crashdumps");
 			auto programPath = util::get_program_path();
 			auto szDumpPath = programPath + "/crashdumps/";
 			szDumpPath += std::string(m_szAppName) + std::string(".dmp");
 			char szScratch[_MAX_PATH];
+			std::cout<<"X"<<std::endl;
 
 			// ask the user if they want to save a dump file
-			if(::MessageBox(NULL, "A terminal error has occurred in the program. Would you like to save a diagnostic file? This file contains information about your system and the state of the game at the time of the crash and can be utilized by a developer to fix the underlying problem.",
-			     m_szAppName, MB_YESNO)
-			  == IDYES) {
+			//if(::MessageBox(NULL, "A terminal error has occurred in the program. Would you like to save a diagnostic file? This file contains information about your system and the state of the game at the time of the crash and can be utilized by a developer to fix the underlying problem.",
+			//     m_szAppName, MB_YESNO)
+			//  == IDYES) {
+			if(true) {
 				// create the file
 				HANDLE hFile = ::CreateFileA(szDumpPath.c_str(), GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-
+std::cout<<"X@"<<std::endl;
 				if(hFile != INVALID_HANDLE_VALUE) {
 					_MINIDUMP_EXCEPTION_INFORMATION ExInfo;
 
 					ExInfo.ThreadId = ::GetCurrentThreadId();
 					ExInfo.ExceptionPointers = pExceptionInfo;
 					ExInfo.ClientPointers = NULL;
-
+std::cout<<"X3"<<std::endl;
 					// write the dump
 					//MiniDumpWithFullMemory
 					BOOL bOK = pDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, MiniDumpNormal, &ExInfo, NULL, NULL);
 					::CloseHandle(hFile);
+					std::cout<<"X4"<<std::endl;
 					if(bOK) {
+						std::cout<<"X5"<<std::endl;
 						std::string err;
 						std::string zipFileName;
 						pragma::detail::close_logger();
+						std::cout<<"X6"<<std::endl;
 						auto zipFile = Engine::GenerateEngineDump("crashdumps/crashdump", zipFileName, err);
+						std::cout<<"X7"<<std::endl;
 						if(zipFile) {
+							std::cout<<"X8"<<std::endl;
 							// Write Minidump
 							VFilePtrReal f = nullptr;
 							auto t = util::Clock::now();
+							std::cout<<"9"<<std::endl;
 							while(f == nullptr) // Wait until dump has been written
 							{
 								auto tNow = util::Clock::now();
@@ -133,6 +142,7 @@ LONG MiniDumper::TopLevelFilter(struct _EXCEPTION_POINTERS *pExceptionInfo)
 								std::this_thread::sleep_for(std::chrono::milliseconds(250));
 								f = FileManager::OpenSystemFile(szDumpPath.c_str(), "rb");
 							}
+							std::cout<<"10"<<std::endl;
 							if(f != nullptr) {
 								auto size = f->GetSize();
 								std::vector<uint8_t> dumpData(size);
@@ -143,10 +153,12 @@ LONG MiniDumper::TopLevelFilter(struct _EXCEPTION_POINTERS *pExceptionInfo)
 							}
 							zipFile = nullptr;
 
+							std::cout<<"11"<<std::endl;
 							sprintf(szScratch, "Saved dump file to '%s'. Please send it to a developer, along with a description of what you did to trigger the error.", zipFileName.c_str() /*,engine_info::get_author_mail_address().c_str()*/);
 							util::open_path_in_explorer(ufile::get_path_from_filename(zipFileName), ufile::get_file_from_filename(zipFileName));
 							szResult = szScratch;
 							retval = EXCEPTION_EXECUTE_HANDLER;
+							std::cout<<"X12"<<std::endl;
 						}
 						else {
 							sprintf(szScratch, err.c_str());
@@ -173,7 +185,7 @@ LONG MiniDumper::TopLevelFilter(struct _EXCEPTION_POINTERS *pExceptionInfo)
 	}
 
 	if(szResult)
-		::MessageBox(NULL, szResult, m_szAppName, MB_OK);
+		;//::MessageBox(NULL, szResult, m_szAppName, MB_OK);
 
 	return retval;
 }
