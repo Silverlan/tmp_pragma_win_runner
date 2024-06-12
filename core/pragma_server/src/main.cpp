@@ -6,11 +6,14 @@
  */
 
 #include "pragma/pragma_executable.hpp"
+#include <iostream>
 
 int main(int argc, char *argv[])
 try {
+	std::cout<<"A"<<std::endl;
 	std::vector<std::string> extraArgs {"-log_file", "log_server.txt"};
 	auto cargs = pragma::merge_arguments(argc, argv, extraArgs);
+	std::cout<<"B"<<std::endl;
 	auto hModule = pragma::launch_pragma(cargs.size(), cargs.data(), true);
 	return hModule ? EXIT_SUCCESS : EXIT_FAILURE;
 }
@@ -21,5 +24,9 @@ catch(...) {
 }
 
 #ifdef _WIN32
-int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) { return main(__argc, __argv); }
+int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
+
+	std::cout<<"WinMain"<<std::endl;
+	return main(__argc, __argv);
+	}
 #endif

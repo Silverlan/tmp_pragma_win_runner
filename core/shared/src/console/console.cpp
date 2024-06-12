@@ -34,6 +34,7 @@ DebugConsole::~DebugConsole() {}
 //TODO: Linux: Reroute pts to different terminal.
 void DebugConsole::open()
 {
+	std::cout<<"open..."<<std::endl;
 #ifdef _WIN32
 	if(!is_console_subsystem()) {
 		AllocConsole();
@@ -65,6 +66,7 @@ void DebugConsole::open()
 
 	// Change the console font
 	if(handleOut) {
+		std::cout<<"changing console font..."<<std::endl;
 		auto fontPath = util::get_program_path() + "\\fonts\\ubuntu\\UbuntuMono-R.ttf";
 		ustring::replace(fontPath, "/", "\\");
 		HANDLE m_stdOut = handleOut;
@@ -97,6 +99,7 @@ void DebugConsole::open()
 	//this->_coutbuf = std::cout.rdbuf();
 	//this->_cerrbuf = std::cerr.rdbuf();
 #endif
+	std::cout<<"console done"<<std::endl;
 }
 
 void DebugConsole::close()
