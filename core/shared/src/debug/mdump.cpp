@@ -16,6 +16,7 @@
 #include <sharedutils/util_file.h>
 #include "pragma/engine_info.hpp"
 #include "pragma/logging.hpp"
+#include <iostream>
 
 extern DLLNETWORK Engine *engine;
 
@@ -24,6 +25,7 @@ LPCSTR MiniDumper::m_szAppName;
 std::string g_crashExceptionMessage = {};
 MiniDumper::MiniDumper(LPCSTR szAppName)
 {
+	std::cout<<"MiniDumper"<<std::endl;
 	// if this assert fires then you have two instances of MiniDumper
 	// which is not allowed
 	assert(m_szAppName == NULL);
@@ -34,6 +36,7 @@ MiniDumper::MiniDumper(LPCSTR szAppName)
 	// Note: set_terminate handler is called before SetUnhandledExceptionFilter.
 	// set_terminate allows us to retrieve the underlying message from the exception (if there was one)
 	set_terminate([]() {
+	std::cout<<"TERMINATE!!!"<<std::endl;
 		auto eptr = std::current_exception();
 		if(!eptr) {
 			g_crashExceptionMessage = {};
@@ -49,12 +52,14 @@ MiniDumper::MiniDumper(LPCSTR szAppName)
 			g_crashExceptionMessage = "Unknown Exception";
 		}
 		// Relay exception to SetUnhandledExceptionFilter
+		td::cout<<"Rethrow!!!"<<std::endl;
 		std::rethrow_exception(eptr);
 	});
 }
 
 LONG MiniDumper::TopLevelFilter(struct _EXCEPTION_POINTERS *pExceptionInfo)
 {
+	std::cout<<"TopLevelFilter"<<std::endl;
 	// MessageBox(0,s_exceptionMessage.c_str(),"Exception",MB_OK);
 	LONG retval = EXCEPTION_CONTINUE_SEARCH;
 	HWND hParent = NULL; // find a better value for your app

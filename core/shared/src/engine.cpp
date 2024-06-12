@@ -116,6 +116,7 @@ Engine::Engine(int, char *[]) : CVarHandler(), m_logFile(nullptr), m_tickRate(En
 
 	m_mainThreadId = std::this_thread::get_id();
 
+	std::cout<<"1"<<std::endl;
 	m_lastTick = static_cast<long long>(m_ctTick());
 	engine = this;
 
@@ -129,6 +130,7 @@ Engine::Engine(int, char *[]) : CVarHandler(), m_logFile(nullptr), m_tickRate(En
     });
 #endif
 
+	std::cout<<"2"<<std::endl;
 	// Link package system to file system
 	m_padPackageManager = upad::link_to_file_system();
 	m_assetManager = std::make_unique<pragma::asset::AssetManager>();
@@ -146,6 +148,7 @@ Engine::Engine(int, char *[]) : CVarHandler(), m_logFile(nullptr), m_tickRate(En
 		m_profilingStageManager->InitializeProfilingStageManager(*m_cpuProfiler, {stageFrame, pragma::debug::ProfilingStage::Create(*m_cpuProfiler, "Think", stageFrame.get()), pragma::debug::ProfilingStage::Create(*m_cpuProfiler, "Tick", stageFrame.get())});
 		static_assert(umath::to_integral(CPUProfilingPhase::Count) == 3u, "Added new profiling phase, but did not create associated profiling stage!");
 	});
+	std::cout<<"3"<<std::endl;
 }
 
 pragma::asset::AssetManager &Engine::GetAssetManager() { return *m_assetManager; }
@@ -599,7 +602,9 @@ void Engine::Release() { Close(); }
 
 bool Engine::Initialize(int argc, char *argv[])
 {
+	std::cout<<"4"<<std::endl;
 	InitLaunchOptions(argc, argv);
+	std::cout<<"5"<<std::endl;
 
 	pragma::detail::initialize_logger(g_lpLogLevelCon, g_lpLogLevelFile, g_lpLogFile);
 	spdlog::info("Engine Version: {}", get_pretty_engine_version());
@@ -637,6 +642,7 @@ bool Engine::Initialize(int argc, char *argv[])
 	pragma::register_engine_animation_events();
 	pragma::register_engine_activities();
 
+	std::cout<<"6"<<std::endl;
 	Con::set_output_callback([this](const std::string_view &output, Con::MessageFlags flags, const Color *color) {
 		if(m_bRecordConsoleOutput == false)
 			return;
@@ -648,6 +654,7 @@ bool Engine::Initialize(int argc, char *argv[])
 	CVarHandler::Initialize();
 	RegisterConsoleCommands();
 
+	std::cout<<"7"<<std::endl;
 	// Initialize Server Instance
 	auto matManager = msys::MaterialManager::Create();
 	matManager->SetImportDirectory("addons/converted/materials");
@@ -663,6 +670,7 @@ bool Engine::Initialize(int argc, char *argv[])
 	m_svInstance = std::unique_ptr<StateInstance>(new StateInstance {matManager, matErr.get()});
 	//
 
+	std::cout<<"8"<<std::endl;
 	if(Lua::get_extended_lua_modules_enabled()) {
 		RegisterConCommand("l", [this](NetworkState *, pragma::BasePlayerComponent *, std::vector<std::string> &argv, float) { RunConsoleCommand("lua_run", argv); });
 	}
@@ -676,15 +684,18 @@ bool Engine::Initialize(int argc, char *argv[])
 		ClearCache();
 	}
 
+	std::cout<<"9"<<std::endl;
 	ServerState *server = OpenServerState();
 	if(server != nullptr && IsServerOnly())
 		LoadConfig();
 
+	std::cout<<"10"<<std::endl;
 	if(!GetConVarBool("asset_file_cache_enabled"))
 		filemanager::set_use_file_index_cache(false);
 	if(!GetConVarBool("asset_multithreading_enabled"))
 		SetAssetMultiThreadedLoadingEnabled(false);
 
+	std::cout<<"11"<<std::endl;
 	return true;
 }
 
