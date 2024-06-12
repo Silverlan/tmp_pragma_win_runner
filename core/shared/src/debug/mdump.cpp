@@ -52,7 +52,7 @@ MiniDumper::MiniDumper(LPCSTR szAppName)
 			g_crashExceptionMessage = "Unknown Exception";
 		}
 		// Relay exception to SetUnhandledExceptionFilter
-		td::cout<<"Rethrow!!!"<<std::endl;
+		std::cout<<"Rethrow!!!"<<std::endl;
 		std::rethrow_exception(eptr);
 	});
 }
